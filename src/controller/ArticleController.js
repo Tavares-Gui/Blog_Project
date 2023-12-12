@@ -49,6 +49,24 @@ class ArticleController {
             return res.status(500).send({ error: "Falha ao salvar o artigo", data: error.message });
         }
     };
+
+    static async likeArticle(req, res) {
+        const { id } = req.params;
+
+        if (!id)
+            return res.status(400).send({ message: "No id provider" })
+
+        try {
+            const article = await Article.findById(id)
+            await Article.findByIdAndUpdate({ _id: id }, { likes: ++article.likes })
+            return res.status(200).send();
+        } 
+        catch (error) 
+        {
+            ArticleController.createLog(error);
+            return res.status(500).send({ error: "Falha ao curtir", data: error.message })
+        }
+    }
 }
 
 module.exports = ArticleController;
