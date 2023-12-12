@@ -5,13 +5,15 @@ const { Author } = require('../model/AuthorModel');
 require('dotenv').config();
 
 const CryptoJS = require("crypto-js");
+const { decrypt } = require('dotenv');
 
-class AuthControler {
+class AuthController {
     static async register(req, res) {
         const { name, birth, email, password, confirmPassword } = req.body;
 
         if (!name)
             return res.status(400).json({ message: "O nome é obrigatório" });
+        
         if (!email)
             return res.status(400).json({ message: "O e-mail é obrigatório" });
 
@@ -57,6 +59,33 @@ class AuthControler {
             return res.status(500).send({ message: "Something failed", data: error.message })
         }
     }
+
+    static async login(req, res){
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        const passwordDecrypt = CryptoJS.AES.decrypt(user.password, process.env.SECRET).toString(CryptoJS.enc.Utf8);
+
+        if(!user)
+            return res.status(400).send({ message: "Invalid Email or password" });
+        if(passwordDecrypt !== password)
+        {
+            return res.status(400).send({ message: "Invalid Email or password" });
+        }
+
+        const secret = process.env.SECRET;
+
+        const token = jwt.sign(
+        {
+            id: user._id,
+        },
+        secret,
+        {
+            expiresIn: '2 days'
+        }
+        );
+        return res.status(200).send({ token: token })
+    }
 }
 
-module.exports = AuthControler;
+module.exports = AuthController;

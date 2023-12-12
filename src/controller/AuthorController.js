@@ -1,4 +1,4 @@
-const User = require('../model/LoginModel');
+// const User = require('../model/LoginModel');
 const { Author } = require("../model/AuthorModel");
 
 class AuthorController {
@@ -27,6 +27,7 @@ class AuthorController {
             return res.status(500).send({ error: "Failed to get data" });
         }
     }
+
     static async getAuthor(_id) {
         try {
             const author = await Author.findById(_id)
