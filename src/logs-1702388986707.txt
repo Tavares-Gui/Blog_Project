@@ -1,0 +1,1 @@
+"article.findByIdAndUpdate is not a function"

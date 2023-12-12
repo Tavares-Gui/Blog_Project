@@ -55,24 +55,32 @@ class ArticleController {
         const { userId } = req.body;
 
         if (!id)
-        return res.status(400).send({ message: "No id provider" })
-    
+            return res.status(400).send({ message: "No id provider" })
+
         try 
         {
-            const article = await Article.findById(id)
-            
-            if(article.arrIds.includes(userId))
-                return res.status(500).send({ error: "Não é possível curtir o artigo mais de uma vez", data: error.message })
+            const article = await Article.findById(id);
+
+            if (article.arrIds.includes(userId)) 
+            {
+                article.arrIds = article.arrIds.filter(des => des != userId);
+                await article.save();
+
+                await Article.findByIdAndUpdate({ _id: id }, { likes: article.arrIds.length })
+                return res.status(201).send({ message: "Like retirado" });
+            }
             
             article.arrIds.push(userId);
             await article.save();
+            
+            await Article.findByIdAndUpdate({ _id: id }, { likes: article.arrIds.length })
 
-            return res.status(200).send();
+            return res.status(201).send({ message: "Artigo curtido" });
         } 
         catch (error) 
         {
             ArticleController.createLog(error);
-            return res.status(500).send({ error: "Falha ao curtir", data: error.message })
+            return res.status(500).send({ error: "Falha ao curtir", data: error.message });
         }
     }
 }
