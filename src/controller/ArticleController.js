@@ -52,13 +52,21 @@ class ArticleController {
 
     static async likeArticle(req, res) {
         const { id } = req.params;
+        const { userId } = req.body;
 
         if (!id)
-            return res.status(400).send({ message: "No id provider" })
-
-        try {
+        return res.status(400).send({ message: "No id provider" })
+    
+        try 
+        {
             const article = await Article.findById(id)
-            await Article.findByIdAndUpdate({ _id: id }, { likes: ++article.likes })
+            
+            if(article.arrIds.includes(userId))
+                return res.status(500).send({ error: "Não é possível curtir o artigo mais de uma vez", data: error.message })
+            
+            article.arrIds.push(userId);
+            await article.save();
+
             return res.status(200).send();
         } 
         catch (error) 

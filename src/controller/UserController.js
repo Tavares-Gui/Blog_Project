@@ -69,20 +69,18 @@ class AuthController {
         if(!user)
             return res.status(400).send({ message: "Invalid Email or password" });
         if(passwordDecrypt !== password)
-        {
             return res.status(400).send({ message: "Invalid Email or password" });
-        }
 
         const secret = process.env.SECRET;
 
         const token = jwt.sign(
-        {
-            id: user._id,
-        },
-        secret,
-        {
-            expiresIn: '2 days'
-        }
+            {
+                id: user._id,
+            },
+            secret,
+            {
+                expiresIn: '2 days'
+            }
         );
         return res.status(200).send({ token: token })
     }

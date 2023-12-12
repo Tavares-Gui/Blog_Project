@@ -21,6 +21,12 @@ const Article = mongoose.model('Article',
             type: Number,
             required: true
         },
+        arrIds: [
+            {
+                type: String,
+                required: false
+            }
+        ],
         createdAt: {
             type: Date,
             required: true
